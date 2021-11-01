@@ -15,27 +15,19 @@ class Evaluator
       if spos = @stack.rindex(:START)
         ret = @stack[spos+1..-1]
         @stack.pop @stack.size - spos
-        return ret
       else
-        @stack.pop 999
+        ret = @stack.pop(@stack.size)
       end
+      ret
     end
   end
 
   def exec(symbol)
     case symbol
-    when :+
+    # binary operators
+    when :+, :-, :*, :/
       a, b = pop(2)
-      @stack << a + b
-    when :-
-      a, b = pop(2)
-      @stack << a - b
-    when :*
-      a, b = pop(2)
-      @stack << a * b
-    when :/
-      a, b = pop(2)
-      @stack << a / b
+      @stack << a.send(symbol, b)
     when :print
       puts pop(:START).join(" ")
     when :input
