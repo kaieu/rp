@@ -34,6 +34,9 @@ class Evaluator
       print ">"
       STDOUT.flush
       @stack << gets.chomp
+    when Symbol
+      frame = pop(:START)
+      frame.first.send symbol, *frame[1..-1]
     end
   end
 
@@ -55,9 +58,14 @@ class Evaluator
       exec $&.to_sym
     when /^"(\w+)"$/ # string
       @stack << $1
+    when "STDOUT", "STDIN", "STDERR"
+      @stack << Object.const_get(token.to_sym)
     when /^\w+$/ # procedure call
       exec $&.to_sym
     end
+  rescue
+    STDERR.puts "error in #{token}"
+    raise
   end
 
   def eval_line(line)
